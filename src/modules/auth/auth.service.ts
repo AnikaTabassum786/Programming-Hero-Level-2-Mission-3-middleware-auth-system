@@ -16,8 +16,17 @@ const loginUserIntoDB = async(email:string, password:string)=>{
         if(!matchPassword){
             throw new Error("Invalid Credentials")
         }
+         
+       const jwtPayload={
+        id: user.rows[0].id,
+        name:user.rows[0].name,
+        password:user.rows[0].password
+       } 
 
-        return user;
+       const secret = 'KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
+       const token = jwt.sign(jwtPayload,secret,{expiresIn:'7d'})
+        // delete user.rows[0].password;
+        return {token, user: user.rows[0]};
 }
 
 export const authService={
