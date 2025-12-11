@@ -23,6 +23,7 @@ const loginUserIntoDB = async(email:string, password:string)=>{
         id: user.rows[0].id,
         name:user.rows[0].name,
         email:user.rows[0].email,
+        role:user.rows[0].role
         
        } 
 

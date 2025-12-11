@@ -3,7 +3,9 @@ import jwt ,{JwtPayload}from "jsonwebtoken"
 import { secret } from "../modules/auth/auth.service";
 import { pool } from "../database/db";
 
-const auth =()=>{
+const auth =(...roles:('admin'|'user')[])=>{//const a = [1,2,3,4...] //{...a} this is rest operator
+  
+  console.log(roles);
     return async(req:Request,res:Response, next:NextFunction) =>{
         const token = req.headers.authorization;
         
@@ -12,7 +14,7 @@ const auth =()=>{
          throw new Error("You are not authorized")
         }
         const decoded = jwt.verify(token,secret) as JwtPayload
-        // console.log(decoded)
+        console.log(decoded)
 
         const user = await pool.query(
           `SELECT * FROM users WHERE email=$1`,[decoded.email]
@@ -21,7 +23,11 @@ const auth =()=>{
         if(user.rows.length === 0){
              throw new Error("User Not Found!")
         }
-        req.user = decoded
+        req.user = decoded;
+
+        if(roles.length && !roles.includes(decoded.role)){
+          throw new Error("You Are Unauthorized")
+        }
         next();
     }
 }
